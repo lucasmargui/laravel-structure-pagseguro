@@ -10,7 +10,7 @@ class HomeController extends Controller
 
 
 $endpoint = 'https://sandbox.api.pagseguro.com/orders';
-$token = '3042bae2-133c-4fef-9a68-1e2fee4212421f4b91f0442887d43ab3d9349c54e6050095-4853-448d-9362-8e7b8de938a2';
+$token = 'token';
 
 $body =
   [
