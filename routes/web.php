@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-
+use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\ItemController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,5 +15,15 @@ use App\Http\Controllers\HomeController;
 |
 */
 
+
+
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
+
+Route::post('/webhook', [WebhookController::class, 'handleWebhook']);
+
+Route::get('/items', [ItemController::class, 'index'])->name('items.index');
+
+Route::get('/items/{id}', [ItemController::class, 'show'])->name('items.show');
+
+Route::post('/items/{id}/buy', [ItemController::class, 'buy'])->name('items.buy');
 

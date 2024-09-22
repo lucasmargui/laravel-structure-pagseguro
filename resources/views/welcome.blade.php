@@ -9,9 +9,7 @@
     </div>
 
     <div class="col-md-12">
-             @if ($data)
-            <img src="{{ $data['qr_codes'][0]['links'][0]['href'] }}" alt="">
-            @endif
+
     </div>
 </div>
 
