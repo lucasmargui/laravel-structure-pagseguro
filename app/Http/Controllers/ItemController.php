@@ -3,132 +3,132 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 
 class ItemController extends Controller
 {
+    // Método para exibir a lista de itens
     public function index()
     {
-        $items = [
-            ['id' => 1, 'name' => 'Item 1', 'price' => 100],
-            ['id' => 2, 'name' => 'Item 2', 'price' => 200],
-            ['id' => 3, 'name' => 'Item 3', 'price' => 300],
-            ['id' => 4, 'name' => 'Item 4', 'price' => 400],
-            ['id' => 5, 'name' => 'Item 5', 'price' => 500],
-        ];
-
-        return view('items.index', compact('items'));
+        return view('items.index');
     }
 
+    // Método para exibir os detalhes de um item específico
     public function show($id)
-{
-    // Simulando a recuperação de dados do item. Em um caso real, você buscaria no banco de dados.
-    $items = [
-        ['id' => 1, 'name' => 'Item 1', 'price' => 100],
-        ['id' => 2, 'name' => 'Item 2', 'price' => 200],
-        ['id' => 3, 'name' => 'Item 3', 'price' => 300],
-        ['id' => 4, 'name' => 'Item 4', 'price' => 400],
-        ['id' => 5, 'name' => 'Item 5', 'price' => 500],
-    ];
+    {
+        $item = $this->findItemById($id);
 
-    // Encontrar o item com o ID correspondente
-    $item = collect($items)->firstWhere('id', $id);
+        if (!$item) {
+            return redirect()->route('items.index')->with('error', 'Item not found');
+        }
 
-    return view('items.show', compact('item'));
-}
-
-public function buy($id)
-{
-    // Simulando a lógica de compra, você pode obter o item real do banco de dados
-    $items = [
-        ['id' => 1, 'name' => 'Item 1', 'price' => 500],
-        ['id' => 2, 'name' => 'Item 2', 'price' => 200],
-        ['id' => 3, 'name' => 'Item 3', 'price' => 300],
-        ['id' => 4, 'name' => 'Item 4', 'price' => 400],
-        ['id' => 5, 'name' => 'Item 5', 'price' => 500],
-    ];
-
-    $item = collect($items)->firstWhere('id', $id);
-
-    // Endpoint e token da API
-    $endpoint = env('PAGSEGURO_ENDPOINT');
-    $token = env('PAGSEGURO_TOKEN');
-
-    // Configurando o corpo da requisição
-    $body = [
-        "reference_id" => "ex-00001",
-        "customer" => [
-            "name" => "Jose da Silva",
-            "email" => "email@test.com",
-            "tax_id" => "12345678909",
-            "phones" => [
-                [
-                    "country" => "55",
-                    "area" => "11",
-                    "number" => "999999999",
-                    "type" => "MOBILE"
-                ]
-            ]
-        ],
-        "items" => [
-            [
-                "name" => $item['name'],
-                "quantity" => 1,
-                "unit_amount" => $item['price']
-            ]
-        ],
-        "qr_codes" => [
-            [
-                "amount" => [
-                    "value" => $item['price']
-                ],
-                "expiration_date" => "2024-10-25T20:15:59-03:00",
-            ]
-        ],
-        "shipping" => [
-            "address" => [
-                "street" => "Avenida Brigadeiro Faria Lima",
-                "number" => "1384",
-                "complement" => "apto 12",
-                "locality" => "Pinheiros",
-                "city" => "São Paulo",
-                "region_code" => "SP",
-                "country" => "BRA",
-                "postal_code" => "01452002"
-            ]
-        ],
-        "notification_urls" => [
-            "https://lucasmargui-webhook.ultrahook.com"
-        ]
-    ];
-
-    // Configurando a requisição cURL
-    $curl = curl_init();
-    curl_setopt($curl, CURLOPT_URL, $endpoint);
-    curl_setopt($curl, CURLOPT_POST, true);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($body));
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
-    curl_setopt($curl, CURLOPT_CAINFO, storage_path('certificates/cacert.pem'));
-    curl_setopt($curl, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-        'Authorization: Bearer ' . $token
-    ]);
-
-    // Executa a requisição
-    $response = curl_exec($curl);
-    $error = curl_error($curl);
-    curl_close($curl);
-
-    // Verifica se ocorreu algum erro
-    if ($error) {
-        return response()->json(['success' => false, 'message' => 'Erro ao realizar a compra: ' . $error], 500);
+        return view('items.show', ['item' => $item]);
     }
 
-    // Decodifica a resposta
-    $data = json_decode($response, true);
+    // Método para comprar um item específico
+    public function buy($id)
+    {
+        $item = $this->findItemById($id);
 
-    // Verifica a resposta da API e retorna como JSON
-    return response()->json(['success' => true, 'message' => 'Compra realizada com sucesso!', 'data' => $data]);
-}
+        if (!$item) {
+            return response()->json(['error' => false, 'message' => 'Item not found'], 404);
+        }
 
+        $body = $this->buildRequestBody($item);
+        $response = $this->sendPurchaseRequest($body);
+
+        if (!$response['success']) {
+            return response()->json(['error' => false, 'message' => 'Erro ao realizar a compra: ' . $response['error']], 500);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Compra realizada com sucesso!', 'data' => $response['data']]);
+    }
+
+    // Método para encontrar um item pelo ID
+    private function findItemById($id)
+    {
+        $items = View::shared('items');
+        return collect($items)->firstWhere('id', $id);
+    }
+
+    // Método para construir o corpo da requisição de compra
+    private function buildRequestBody($item)
+    {
+        return [
+            "reference_id" => "ex-00001",
+            "customer" => [
+                "name" => "Name example",
+                "email" => "email@test.com",
+                "tax_id" => "12345678909",
+                "phones" => [
+                    [
+                        "country" => "55",
+                        "area" => "11",
+                        "number" => "999999999",
+                        "type" => "MOBILE"
+                    ]
+                ]
+            ],
+            "items" => [
+                [
+                    "name" => $item['name'],
+                    "quantity" => 1,
+                    "unit_amount" => $item['price']
+                ]
+            ],
+            "qr_codes" => [
+                [
+                    "amount" => [
+                        "value" => $item['price']
+                    ],
+                    "expiration_date" => "2024-10-25T20:15:59-03:00",
+                ]
+            ],
+            "shipping" => [
+                "address" => [
+                    "street" => "Avenida Brigadeiro Faria Lima",
+                    "number" => "1384",
+                    "complement" => "apto 12",
+                    "locality" => "Pinheiros",
+                    "city" => "São Paulo",
+                    "region_code" => "SP",
+                    "country" => "BRA",
+                    "postal_code" => "01452002"
+                ]
+            ],
+            "notification_urls" => [
+                "https://lucasmargui-webhook.ultrahook.com"
+            ]
+        ];
+    }
+
+    // Método para enviar a requisição de compra à API PagSeguro
+    private function sendPurchaseRequest($body)
+    {
+        $endpoint = env('PAGSEGURO_ENDPOINT');
+        $token = env('PAGSEGURO_TOKEN');
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $endpoint);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($body));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($curl, CURLOPT_CAINFO, storage_path('certificates/cacert.pem'));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token
+        ]);
+
+        $response = curl_exec($curl);
+        $error = curl_error($curl);
+        curl_close($curl);
+
+        if ($error) {
+            return ['success' => false, 'error' => $error];
+        }
+
+        $data = json_decode($response, true);
+        return ['success' => true, 'data' => $data];
+    }
 }

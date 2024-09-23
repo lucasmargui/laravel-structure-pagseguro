@@ -156,6 +156,8 @@ return [
 
     'providers' => [
 
+        App\Providers\ItemServiceProvider::class,
+
         /*
          * Laravel Framework Service Providers...
          */
