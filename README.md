@@ -1,8 +1,37 @@
+# Curl to API
 
+This project integrates a buy button functionality with the PagBank API to trigger a payment process, generate a QR code, and handle notifications via a webhook.
 
+![image](https://github.com/user-attachments/assets/7d54e21b-5337-4c8e-bc43-3177cc2345bd)
 
-# Initial Environment 
+## Overview
 
+The application allows users to trigger a purchase using a "Buy" button in the `ItemController`. Upon purchase, the system sends a request to PagBank's API to generate a QR code for payment. The QR code is then displayed to the user, and once payment is made, a webhook is triggered to notify the system of the completed transaction.
+
+## Features
+
+- Trigger a purchase with a "Buy" button.
+- Build and send requests to PagBank's API.
+- Display QR code for payment.
+- Handle payment notifications via webhook.
+
+---
+
+## Webhook Setup
+
+Ensure that the correct `notification_url` is configured in the request body so that the system can receive payment status updates from PagBank.
+
+## Requirements
+
+- PHP
+- cURL
+- PagBank API credentials
+- Ultrahook API credentials
+
+---
+
+<details>
+<summary>Click to show details about </summary>
 
 ## 1. Create an Account in PagBank to Use the API in Sandbox
 
@@ -30,9 +59,8 @@ Ultrahook is used to expose your local server to the internet for webhook testin
 
 1. **Create an Ultrahook Account**:  
    Go to the [Ultrahook website](https://www.ultrahook.com/) and sign up for an account.
-
-  ![image](https://github.com/user-attachments/assets/f56c47ab-6de9-4282-a913-a2f3127347bf)
-
+         ![image](https://github.com/user-attachments/assets/f56c47ab-6de9-4282-a913-a2f3127347bf)
+   
 3. **Generate API Key**:  
    After logging in, generate your API key. This will be needed to initiate the Ultrahook server.
 
@@ -48,32 +76,104 @@ Ultrahook is used to expose your local server to the internet for webhook testin
 
    ![image](https://github.com/user-attachments/assets/4dcaa6bc-0262-45e5-ad15-dca181ee30ae)
 
-5. **Configure `.env` File**:  
+5. **Configure `.env` File**:
+   Update your .env file to include the Ultrahook endpoint that will be used to receive webhook events from PagBank.
+   ![image](https://github.com/user-attachments/assets/dd6cccac-c8db-438a-b166-a194a6de7bfb)
 
-![image](https://github.com/user-attachments/assets/dd6cccac-c8db-438a-b166-a194a6de7bfb)
+</details>
+
+## Installation
+
+1. Clone the repository.
+2. Configure environment variables for the PagBank API credentials.
+3. Set up the webhook URL in the PagBank dashboard.
+
+```bash
+git clone [repository-url]
+composer install
+npm install
+```
+
+---
+
+## Process Flow
+
+### 1. **Buy Button Trigger**
+
+The "Buy" button triggers the `buy` action within the `ItemController`.
+
+<details>
+<summary>Click to show details about </summary>
+
+![image](https://github.com/user-attachments/assets/f0913b3d-ea62-47ac-ab87-28ded7d18d99)
+
+    
+</details>
+
+### 2. **Action Buy: Build Request Body**
+
+In the `buy` action, a request body is constructed (`buildRequestBody`) to send purchase details to PagBank's API.
+
+<details>
+<summary>Click to show details about </summary>
+
+![image](https://github.com/user-attachments/assets/173ccd48-315e-4840-9871-e780a5926780)
+
+    
+</details>
+
+### 3. **Action Buy: Send Purchase Request**
+
+After the request body is built, the system sends a `sendPurchaseRequest` using cURL to PagBank’s API.
+
+<details>
+<summary>Click to show details about </summary>
+
+![image](https://github.com/user-attachments/assets/0046a41c-8d1f-4c38-a880-135e62445585)
+
+    
+</details>
+
+### 4. **PagBank API Interaction**
+
+- **Receive Body Request**: PagBank’s API receives the body request sent by the system.
+- **Generate QR Code**: Upon successful processing, PagBank returns a response containing a QR code.
+
+<details>
+<summary>Click to show details about </summary>
+</details>
+
+### 5. **Response from cURL**
+
+- **Successful Response**: If the request is successfully processed, the response will include data with a QR code.
+- **Show QR Code**: The QR code is then rendered as an image and displayed to the user.
+
+<details>
+<summary>Click to show details about </summary>
+
+![image](https://github.com/user-attachments/assets/d30aec58-adef-43bd-b95e-17e4bdc88c84)
+
+    
+</details>
+
+### 6. **QR Code Payment**
+
+Once the user scans and pays via the QR code, PagBank’s API generates a notification confirming the payment.
+
+<details>
+<summary>Click to show details about </summary>
+</details>
+
+### 7. **Webhook for Payment Notification**
+
+PagBank sends notifications to the `notification_url` specified in the `buildRequestBody`. This webhook is responsible for updating the system on the payment status.
 
 
 
+<details>
+<summary>Click to show details about </summary>
+</details>
 
+---
 
-
-# Curl to api
-
-# Api PagSeguro
-
-# Response QR CODE
-
-# QR CODE pay
-
-# WebHook payment
-
-![image](https://github.com/user-attachments/assets/b7e7fada-422d-4158-8b7f-01b1716f57d6)
-
-![image](https://github.com/user-attachments/assets/204596b1-6495-487b-a082-b4bcbc27640c)
-
-![image](https://github.com/user-attachments/assets/331e1bcb-6a5a-4581-90d9-35678fa99dbc)
-
-![image](https://github.com/user-attachments/assets/9e03f4e6-b438-4579-be26-9ad4c754b3e4)
-
-![image](https://github.com/user-attachments/assets/8c2bcdbe-8174-495e-9cf7-9c6921a511af)
 
