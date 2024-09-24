@@ -90,12 +90,13 @@ Ultrahook is used to expose your local server to the internet for webhook testin
 
 ## Starting the Development Server
 
-1. Start laravel server.
+Start **laravel** server.
 
 ```bash
 php artisan serve
 ```
-1. Start ultrahook server.
+
+Start **ultrahook** server.
    
 ```bash
 ultrahook webhook 8000/webhook
@@ -172,9 +173,6 @@ After the request body is built, the system sends a `sendPurchaseRequest` using 
 
 Once the user scans and pays via the QR code, PagBank’s API generates a notification confirming the payment.
 
-<details>
-<summary>Click to show details about </summary>
-</details>
 
 ### 7. **Webhook for Payment Notification**
 
