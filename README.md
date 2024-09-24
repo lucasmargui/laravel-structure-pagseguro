@@ -6,6 +6,11 @@
 
 ![image](https://github.com/user-attachments/assets/1e964919-6e26-479d-aeaf-b72403e3def0)
 
+### Setup .env with token and api sandbox
+
+![image](https://github.com/user-attachments/assets/c383ec81-4092-4b17-a0a0-4ecef8561310)
+
+
 
 ## Create a account in ultrahook
 
@@ -13,6 +18,17 @@
 
 ![image](https://github.com/user-attachments/assets/f57517b5-0e00-4cae-a29e-f1e61d29d5b5)
 
+
+### Create file with api key 
+
+![image](https://github.com/user-attachments/assets/c135eb92-c29a-46c0-89de-3d7288db47aa)
+
+![image](https://github.com/user-attachments/assets/4dcaa6bc-0262-45e5-ad15-dca181ee30ae)
+
+
+### Setup .env with ultrahook endpoint
+
+![image](https://github.com/user-attachments/assets/dd6cccac-c8db-438a-b166-a194a6de7bfb)
 
 
 
