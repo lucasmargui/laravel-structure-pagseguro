@@ -1,6 +1,6 @@
-# QR Code Pix
+# Laravel + Api PagBank + Pix + Webhook
 
-This project integrates a buy button functionality with the PagBank API to trigger a payment process, generate a QR code, and handle notifications via a webhook.
+This project in Laravel integrates a buy button functionality with the PagBank API to trigger a payment process, generate a QR code, and handle notifications via a webhook.
 
 ![image](https://github.com/user-attachments/assets/7d54e21b-5337-4c8e-bc43-3177cc2345bd)
 
