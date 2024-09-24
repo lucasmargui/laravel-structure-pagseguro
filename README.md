@@ -1,4 +1,4 @@
-# Curl to API
+# QR Code Pix
 
 This project integrates a buy button functionality with the PagBank API to trigger a payment process, generate a QR code, and handle notifications via a webhook.
 
@@ -7,6 +7,8 @@ This project integrates a buy button functionality with the PagBank API to trigg
 ## Overview
 
 The application allows users to trigger a purchase using a "Buy" button in the `ItemController`. Upon purchase, the system sends a request to PagBank's API to generate a QR code for payment. The QR code is then displayed to the user, and once payment is made, a webhook is triggered to notify the system of the completed transaction.
+
+---
 
 ## Features
 
@@ -17,21 +19,26 @@ The application allows users to trigger a purchase using a "Buy" button in the `
 
 ---
 
-## Webhook Setup
+## Installation
 
-Ensure that the correct `notification_url` is configured in the request body so that the system can receive payment status updates from PagBank.
-
-## Requirements
-
-- PHP
-- cURL
-- PagBank API credentials
-- Ultrahook API credentials
-
----
 
 <details>
 <summary>Click to show details about </summary>
+
+
+## Installation project
+    
+1. Clone the repository.
+2. Configure environment variables for the PagBank API credentials and Ultrahook credentials.
+
+```bash
+git clone [repository-url]
+composer install
+npm install
+```
+
+
+## Getting Credentials
 
 ## 1. Create an Account in PagBank to Use the API in Sandbox
 
@@ -80,23 +87,26 @@ Ultrahook is used to expose your local server to the internet for webhook testin
    Update your .env file to include the Ultrahook endpoint that will be used to receive webhook events from PagBank.
    ![image](https://github.com/user-attachments/assets/dd6cccac-c8db-438a-b166-a194a6de7bfb)
 
-</details>
 
-## Installation
+## Starting the Development Server
 
-1. Clone the repository.
-2. Configure environment variables for the PagBank API credentials.
-3. Set up the webhook URL in the PagBank dashboard.
+1. Start laravel server.
 
 ```bash
-git clone [repository-url]
-composer install
-npm install
+php artisan serve
+```
+1. Start ultrahook server.
+   
+```bash
+ultrahook webhook 8000/webhook
 ```
 
----
+</details>
 
 ## Process Flow
+
+<details>
+<summary>Click to show details about </summary>
 
 ### 1. **Buy Button Trigger**
 
@@ -169,11 +179,56 @@ Once the user scans and pays via the QR code, PagBank’s API generates a notifi
 PagBank sends notifications to the `notification_url` specified in the `buildRequestBody`. This webhook is responsible for updating the system on the payment status.
 
 
-
 <details>
 <summary>Click to show details about </summary>
+
+### Notification Flow
+
+1. **PagSeguro Notifications**: The PagSeguro API sends notifications of completed payments to the URLs listed in the *Notification URLs*.
+
+   ![image](https://github.com/user-attachments/assets/afa85b48-1347-47a8-b20a-5586c03fe87d)
+
+2. **Ultrahook**: The previously created Ultrahook is configured in the *Notification URLs* and will be responsible for receiving these notifications.
+
+   ![image](https://github.com/user-attachments/assets/bd1aeeda-10cd-4161-966e-0e4ae6985e07)
+
+3. **Redirection to Local Server**: The Ultrahook redirects the received notifications to the local server at `http://localhost:8000/webhook`.
+
+   ![image](https://github.com/user-attachments/assets/c67bd5d4-3895-4ddf-baad-dd99500e942e)
+
+4. **POST Request Reception**: The URL `http://localhost:8000/webhook` receives the POST request sent by the Ultrahook.
+
+   ![image](https://github.com/user-attachments/assets/110a630c-5b91-4d25-8de9-e5d25925ba39)
+
+   ![image](https://github.com/user-attachments/assets/47dc94ef-887d-4d0b-8d86-562761f798fc)
+
+6. **Broadcast Update**: Upon receiving the POST request, the server emits a broadcast to a specific channel.
+
+    ![image](https://github.com/user-attachments/assets/64df329d-e258-4647-924c-df4b6075b4ac)
+
+   ![image](https://github.com/user-attachments/assets/3fbbf0f8-a045-4364-9ae9-d31fc696d0c8)
+
+
+7. **Real-Time Update**: The page listening to the channel receives the broadcast with the notification data and performs a real-time update.
+
+    ![image](https://github.com/user-attachments/assets/662fd346-4079-468e-9a0f-4487a3efc48e)
+
+    
+</details>
+
 </details>
 
 ---
+
+## Screenshot
+
+
+![image](https://github.com/user-attachments/assets/204596b1-6495-487b-a082-b4bcbc27640c)
+
+![image](https://github.com/user-attachments/assets/331e1bcb-6a5a-4581-90d9-35678fa99dbc)
+
+![image](https://github.com/user-attachments/assets/9e03f4e6-b438-4579-be26-9ad4c754b3e4)
+
+![image](https://github.com/user-attachments/assets/8c2bcdbe-8174-495e-9cf7-9c6921a511af)
 
 
