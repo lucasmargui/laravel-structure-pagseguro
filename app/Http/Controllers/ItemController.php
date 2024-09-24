@@ -54,6 +54,9 @@ class ItemController extends Controller
     // Método para construir o corpo da requisição de compra
     private function buildRequestBody($item)
     {
+        
+        $endpoint = env('ULTRAHOOK_ENDPOINT');
+
         return [
             "reference_id" => "ex-00001",
             "customer" => [
@@ -97,7 +100,7 @@ class ItemController extends Controller
                 ]
             ],
             "notification_urls" => [
-                "https://lucasmargui-webhook.ultrahook.com"
+                $endpoint
             ]
         ];
     }
